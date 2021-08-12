@@ -1,0 +1,33 @@
+@page "/register"
+
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavManager
+
+Register
+
+<EditForm Model="@RegisterAccount" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="RegisterAccount.Email" />
+    <InputText @bind-Value="RegisterAccount.Password" />
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code
+{
+    public RegisterAccountFormDto RegisterAccount { get; set; } = new RegisterAccountFormDto();
+
+    async void HandleValidSubmit()
+    {
+        HttpClient httpClient = HttpClientFactory.CreateClient("JwtClient");
+
+        using var response = await httpClient.PostAsJsonAsync("account/register", RegisterAccount);
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavManager.NavigateTo("/");
+        }
+    }
+}

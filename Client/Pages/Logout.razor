@@ -1,0 +1,26 @@
+@page "/logout"
+
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider JwtAuthenticationState
+
+Logging out...
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient httpClient = HttpClientFactory.CreateClient("JwtClient");
+
+        var auth = await JwtAuthenticationState.GetAuthenticationStateAsync();
+
+        if (auth.User.Identity.IsAuthenticated) {
+            await ((JwtAuthenticationStateProvider)JwtAuthenticationState).Logout();
+        }
+
+        NavManager.NavigateTo("/");
+    }
+}
+

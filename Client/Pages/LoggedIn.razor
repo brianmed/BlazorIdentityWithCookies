@@ -1,0 +1,25 @@
+@page "/loggedIn"
+
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager NavManager
+
+<AuthorizeView>
+    <Authorized>
+        Logged in
+        <button @onclick=@Logout>Logout</button>
+    </Authorized>
+</AuthorizeView>
+
+@code
+{
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    void Logout()
+    {
+        NavManager.NavigateTo("logout");
+    }
+}    

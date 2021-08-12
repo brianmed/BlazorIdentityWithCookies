@@ -1,0 +1,47 @@
+@page "/login"
+
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavManager
+@inject AuthenticationStateProvider JwtAuthenticationState
+
+Login
+
+<EditForm Model="@LoginAccount" OnValidSubmit="@HandleValidSubmit" Context="joy">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="LoginAccount.Email" />
+    <InputText @bind-Value="LoginAccount.Password" />
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+<AuthorizeView>
+    <Authorized>
+        <button @onclick=@LoggedInPage>Logged In Page</button>
+    </Authorized>
+</AuthorizeView>
+
+@code
+{
+    public LoginAccountFormDto LoginAccount { get; set; } = new LoginAccountFormDto();
+
+    async void HandleValidSubmit()
+    {
+        HttpClient httpClient = HttpClientFactory.CreateClient("JwtClient");
+
+        using var response = await httpClient.PostAsJsonAsync("account/login", LoginAccount);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await ((JwtAuthenticationStateProvider)JwtAuthenticationState).Login();
+
+            NavManager.NavigateTo("/");
+        }
+    }
+
+    void LoggedInPage()
+    {
+        NavManager.NavigateTo("loggedIn");
+    }
+}

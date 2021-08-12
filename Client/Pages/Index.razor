@@ -1,0 +1,27 @@
+﻿@page "/"
+
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavManager
+
+Redirecting...
+
+@code
+{
+    [CascadingParameter]
+    private Task<AuthenticationState> AuthenticationState { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        HttpClient httpClient = HttpClientFactory.CreateClient("JwtClient");
+
+        var authCtx = await AuthenticationState;
+
+        if (await httpClient.GetFromJsonAsync<bool>("account/hasAdminAccount") is false) {
+            NavManager.NavigateTo("register");
+        } else if (authCtx.User.Identity.IsAuthenticated) {
+            NavManager.NavigateTo("loggedIn");
+        } else {
+            NavManager.NavigateTo("login");
+        }
+    }
+}
